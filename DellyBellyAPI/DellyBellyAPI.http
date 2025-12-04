@@ -1,0 +1,6 @@
+@DellyBellyAPI_HostAddress = http://localhost:5002
+
+GET {{DellyBellyAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

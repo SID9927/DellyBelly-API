@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="../DellyBelly.Application/DellyBelly.Application.csproj" />
+  <Project Path="../DellyBelly.Domain/DellyBelly.Domain.csproj" />
+  <Project Path="../DellyBelly.Infrastructure/DellyBelly.Infrastructure.csproj" />
+  <Project Path="../DellyBelly.IntegrationTests/DellyBelly.IntegrationTests.csproj" />
+  <Project Path="../DellyBelly.Shared/DellyBelly.Shared.csproj" />
+  <Project Path="../DellyBelly.UnitTests/DellyBelly.UnitTests.csproj" />
+  <Project Path="DellyBelly.API.csproj" />
+</Solution>

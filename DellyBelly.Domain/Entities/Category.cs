@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DellyBelly.Domain.Entities
+{
+    public class Category
+    {
+        public int Id { get; set; }                     // Primary Key
+        public string Name { get; set; }                // Category name
+        public string Description { get; set; }         // Optional description
+        public bool IsActive { get; set; } = true;      // Active flag
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // One-to-one relationship
+        // One-to-one relationship (Category has one Image)
+        public ImageEntity? Image { get; set; }
+
+
+        // Navigation property (optional for future Product linking)
+        public ICollection<Product>? Products { get; set; }
+
+    }
+}
