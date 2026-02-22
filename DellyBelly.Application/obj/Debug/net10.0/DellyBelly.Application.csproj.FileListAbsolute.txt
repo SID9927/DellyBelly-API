@@ -36,3 +36,4 @@ D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Application\obj\Debug\
 D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Application\obj\Debug\net10.0\refint\DellyBelly.Application.dll
 D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Application\obj\Debug\net10.0\DellyBelly.Application.pdb
 D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Application\obj\Debug\net10.0\ref\DellyBelly.Application.dll
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Application\obj\Debug\net10.0\DellyBelly.Application.sourcelink.json

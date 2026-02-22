@@ -20,29 +20,17 @@ namespace DellyBelly.Application.Services
         public async Task<IEnumerable<Gallery>> GetAllAsync()
         {
             return await _context.Galleries
-                .Include(g => g.Images)
                 .ToListAsync();
         }
 
         public async Task<Gallery?> GetByIdAsync(int id)
         {
             return await _context.Galleries
-                .Include(g => g.Images)
                 .FirstOrDefaultAsync(g => g.Id == id);
         }
 
         public async Task<Gallery> CreateAsync(Gallery gallery)
         {
-            // Handle empty/invalid image objects from client
-            if (gallery.Images != null && gallery.Images.Any())
-            {
-                var validImages = gallery.Images
-                    .Where(i => !string.IsNullOrEmpty(i.FileName) && i.Data != null && i.Data.Length > 0)
-                    .ToList();
-
-                gallery.Images = validImages.Any() ? validImages : null;
-            }
-
             _context.Galleries.Add(gallery);
             await _context.SaveChangesAsync();
             return gallery;

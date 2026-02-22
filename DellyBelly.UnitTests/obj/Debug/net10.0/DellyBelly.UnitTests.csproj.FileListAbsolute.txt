@@ -30,3 +30,4 @@ D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.UnitTests\obj\Debug\ne
 D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.UnitTests\obj\Debug\net10.0\DellyBelly.UnitTests.pdb
 D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.UnitTests\obj\Debug\net10.0\DellyBelly.UnitTests.genruntimeconfig.cache
 D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.UnitTests\obj\Debug\net10.0\ref\DellyBelly.UnitTests.dll
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.UnitTests\obj\Debug\net10.0\DellyBelly.UnitTests.sourcelink.json

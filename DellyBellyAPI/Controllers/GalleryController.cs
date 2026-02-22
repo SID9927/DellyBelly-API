@@ -1,4 +1,5 @@
 using DellyBelly.Application.Interfaces;
+using DellyBelly.Application.DTOs;
 using DellyBelly.Domain.Entities;
 using DellyBelly.Shared.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,13 @@ namespace DellyBellyAPI.Controllers
             return Ok(galleries);
         }
 
+        [HttpGet("debug-count")]
+        public async Task<IActionResult> GetCount()
+        {
+            var galleries = await _galleryService.GetAllAsync();
+            return Ok(new { count = galleries.Count() });
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -35,14 +43,19 @@ namespace DellyBellyAPI.Controllers
             return Ok(gallery);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(DellyBellyAPI.DTOs.CreateGalleryDto galleryDto)
+        // Renamed to Upload for clarity as each upload IS a gallery item now
+        [HttpPost] 
+        public async Task<IActionResult> Upload(IFormFile file)
         {
+            using var stream = file.OpenReadStream();
+            var (webpBytes, fileName, contentType) = await ImageHelper.CreateWebPImageAsync(stream, file.FileName);
+
             var gallery = new Gallery
             {
-                Name = galleryDto.Name,
-                Description = galleryDto.Description,
-                IsActive = galleryDto.IsActive
+                IsActive = true,
+                FileName = fileName,
+                ContentType = contentType,
+                Data = webpBytes
             };
 
             var created = await _galleryService.CreateAsync(gallery);
@@ -50,10 +63,15 @@ namespace DellyBellyAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Gallery gallery)
+        public async Task<IActionResult> Update(int id, UpdateGalleryDto dto)
         {
-            if (id != gallery.Id) return BadRequest();
-            var updated = await _galleryService.UpdateAsync(gallery);
+            var existing = await _galleryService.GetByIdAsync(id);
+            if (existing == null) return NotFound();
+
+            // Only update mutable fields (IsActive)
+            existing.IsActive = dto.IsActive;
+
+            var updated = await _galleryService.UpdateAsync(existing);
             return Ok(updated);
         }
 
@@ -64,31 +82,6 @@ namespace DellyBellyAPI.Controllers
             if (!result) return NotFound();
             return NoContent();
         }
-
-        [HttpPost("{id}/upload-photo")]
-        public async Task<IActionResult> UploadGalleryPhoto(int id, IFormFile file)
-        {
-            var gallery = await _galleryService.GetByIdAsync(id);
-            if (gallery == null) return NotFound();
-
-            using var stream = file.OpenReadStream();
-            var (webpBytes, fileName, contentType) = await ImageHelper.CreateWebPImageAsync(stream, file.FileName);
-
-            var image = new ImageEntity
-            {
-                FileName = fileName,
-                ContentType = contentType,
-                Data = webpBytes,
-                Source = "Gallery",
-                GalleryId = id
-            };
-
-            gallery.Images ??= new List<ImageEntity>();
-            gallery.Images.Add(image);
-
-            await _galleryService.UpdateAsync(gallery);
-
-            return Ok(new { gallery.Id, gallery.Name, image.FileName });
-        }
     }
 }
+ 

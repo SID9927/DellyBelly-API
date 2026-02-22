@@ -19,6 +19,9 @@ namespace DellyBellyAPI.DTOs
 
         public bool IsAvailable { get; set; } = true;
 
+        public bool IsBestSeller { get; set; } = false;
+        public bool IsRecommended { get; set; } = false;
+
         [Required]
         public int CategoryId { get; set; }
     }

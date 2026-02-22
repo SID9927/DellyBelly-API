@@ -12,11 +12,14 @@ namespace DellyBelly.Domain.Entities
         public decimal Price { get; set; }              // Price in INR
         public int Stock { get; set; }                  // Inventory count
         public bool IsAvailable { get; set; } = true;   // Availability flag
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
         // Foreign Key
         public int CategoryId { get; set; }
         public Category Category { get; set; }          // Navigation property
+
+        public bool IsBestSeller { get; set; } = false;
+        public bool IsRecommended { get; set; } = false;
 
         // One-to-many relationship (a product can have multiple images)
         public ICollection<ImageEntity>? Images { get; set; }

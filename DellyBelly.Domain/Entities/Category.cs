@@ -10,7 +10,7 @@ namespace DellyBelly.Domain.Entities
         public string Name { get; set; }                // Category name
         public string Description { get; set; }         // Optional description
         public bool IsActive { get; set; } = true;      // Active flag
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
         // One-to-one relationship
         // One-to-one relationship (Category has one Image)

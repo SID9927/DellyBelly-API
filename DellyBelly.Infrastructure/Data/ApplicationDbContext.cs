@@ -19,6 +19,9 @@ namespace DellyBelly.Infrastructure.Data
         public DbSet<Employee> Employees { get; set; }
         public DbSet<ImageEntity> Images { get; set; }
         public DbSet<Gallery> Galleries { get; set; }
+        public DbSet<ApiLog> ApiLogs { get; set; }
+        public DbSet<NewsletterSubscription> NewsletterSubscriptions { get; set; }
+        public DbSet<ContactMessage> ContactMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

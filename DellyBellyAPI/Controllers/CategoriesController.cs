@@ -1,8 +1,10 @@
 ﻿using DellyBelly.Application.Interfaces;
 using DellyBelly.Domain.Entities;
+using DellyBelly.Infrastructure.Data;
 using DellyBelly.Shared.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DellyBellyAPI.Controllers
 {
@@ -12,9 +14,12 @@ namespace DellyBellyAPI.Controllers
     public class CategoriesController :ControllerBase
     {
         private readonly ICategoryService _categoryService;
-        public CategoriesController(ICategoryService categoryService)
+        private readonly ApplicationDbContext _context;
+
+        public CategoriesController(ICategoryService categoryService, ApplicationDbContext context)
         {
             _categoryService = categoryService;
+            _context = context;
         }
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -46,13 +51,16 @@ namespace DellyBellyAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = createdCategory.Id }, createdCategory);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Category category)
+        public async Task<IActionResult> Update(int id, [FromBody] DellyBellyAPI.DTOs.CreateCategoryDto categoryDto)
         {
-            if (id != category.Id)
-            {
-                return BadRequest();
-            }
-            var updatedCategory = await _categoryService.UpdateAsync(category);
+            var existingCategory = await _categoryService.GetByIdAsync(id);
+            if (existingCategory == null) return NotFound();
+
+            existingCategory.Name = categoryDto.Name;
+            existingCategory.Description = categoryDto.Description;
+            existingCategory.IsActive = categoryDto.IsActive;
+
+            var updatedCategory = await _categoryService.UpdateAsync(existingCategory);
             return Ok(updatedCategory);
         }
         [HttpDelete("{id}")]
@@ -90,13 +98,21 @@ namespace DellyBellyAPI.Controllers
             return Ok(new { category.Id, category.Name, image.FileName });
         }
 
+        // Fast path: query Images table directly — avoids loading the entire Category entity
         [HttpGet("{id}/photo")]
         public async Task<IActionResult> GetCategoryPhoto(int id)
         {
-            var category = await _categoryService.GetByIdAsync(id);
-            if (category?.Image == null) return NotFound();
+            var image = await _context.Images
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.CategoryId == id && i.Source == "Category");
 
-            return File(category.Image.Data, category.Image.ContentType, category.Image.FileName);
+            if (image?.Data == null) return NotFound();
+
+            // Browser caches category images for 24 hours
+            Response.Headers["Cache-Control"] = "public, max-age=86400, immutable";
+            Response.Headers["ETag"] = $"\"cat-{id}\"";
+
+            return File(image.Data, image.ContentType, image.FileName);
         }
 
         [HttpPut("{id}/update-photo")]
@@ -114,7 +130,7 @@ namespace DellyBellyAPI.Controllers
                 category.Image.FileName = fileName;
                 category.Image.ContentType = contentType;
                 category.Image.Data = webpBytes;
-                category.Image.UploadedAt = DateTime.UtcNow;
+                category.Image.UploadedAt = DateTimeHelper.GetIndianTime();
                 category.Image.Source = "Category";
             }
             else

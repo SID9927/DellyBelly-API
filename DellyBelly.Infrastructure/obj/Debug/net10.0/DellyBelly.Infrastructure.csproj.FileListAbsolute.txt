@@ -36,3 +36,4 @@ D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Infrastructure\obj\Deb
 D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Infrastructure\obj\Debug\net10.0\DellyBelly.Infrastructure.pdb
 D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Infrastructure\obj\Debug\net10.0\DellyBelly.Infrastructure.genruntimeconfig.cache
 D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Infrastructure\obj\Debug\net10.0\ref\DellyBelly.Infrastructure.dll
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Infrastructure\obj\Debug\net10.0\DellyBelly.Infrastructure.sourcelink.json

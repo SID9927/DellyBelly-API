@@ -30,6 +30,11 @@ namespace DellyBelly.Infrastructure.Configurations
                    .WithMany(c => c.Products)
                    .HasForeignKey(p => p.CategoryId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(p => p.IsBestSeller)
+                   .HasDefaultValue(false);
+            builder.Property(p => p.IsRecommended)
+                   .HasDefaultValue(false);
             // One-to-many relationship with ImageEntity
             builder.HasMany(p => p.Images)
                    .WithOne()

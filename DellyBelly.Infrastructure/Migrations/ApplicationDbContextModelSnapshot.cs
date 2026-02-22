@@ -22,6 +22,58 @@ namespace DellyBelly.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DellyBelly.Domain.Entities.ApiLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Duration")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("QueryString")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("RequestBody")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTime>("RequestTime")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<string>("ResponseBody")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTime>("ResponseTime")
+                        .HasColumnType("datetime2(3)");
+
+                    b.Property<int>("StatusCode")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApiLogs");
+                });
+
             modelBuilder.Entity("DellyBelly.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -149,25 +201,27 @@ namespace DellyBelly.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("Description")
+                    b.Property<string>("ContentType")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<DateTime>("UploadedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.HasKey("Id");
 
@@ -199,9 +253,6 @@ namespace DellyBelly.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("GalleryId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
@@ -219,9 +270,9 @@ namespace DellyBelly.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[CategoryId] IS NOT NULL");
 
-                    b.HasIndex("GalleryId");
-
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("Source");
 
                     b.ToTable("Images");
                 });
@@ -252,6 +303,16 @@ namespace DellyBelly.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<bool>("IsBestSeller")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsRecommended")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -269,6 +330,12 @@ namespace DellyBelly.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("IsAvailable");
+
+                    b.HasIndex("IsBestSeller");
+
+                    b.HasIndex("IsRecommended");
+
                     b.ToTable("Products");
                 });
 
@@ -279,19 +346,12 @@ namespace DellyBelly.Infrastructure.Migrations
                         .HasForeignKey("DellyBelly.Domain.Entities.ImageEntity", "CategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("DellyBelly.Domain.Entities.Gallery", "Gallery")
-                        .WithMany("Images")
-                        .HasForeignKey("GalleryId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("DellyBelly.Domain.Entities.Product", null)
                         .WithMany("Images")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Category");
-
-                    b.Navigation("Gallery");
                 });
 
             modelBuilder.Entity("DellyBelly.Domain.Entities.Product", b =>
@@ -310,11 +370,6 @@ namespace DellyBelly.Infrastructure.Migrations
                     b.Navigation("Image");
 
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("DellyBelly.Domain.Entities.Gallery", b =>
-                {
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("DellyBelly.Domain.Entities.Product", b =>
