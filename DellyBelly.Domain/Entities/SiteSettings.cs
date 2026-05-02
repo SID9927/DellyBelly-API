@@ -7,27 +7,23 @@ namespace DellyBelly.Domain.Entities
 {
     public class SiteSettings
     {
-        public int Id { get; set; }                  // Primary Key (usually 1 for singleton)
-        public string StoreName { get; set; }        // name
-        public string Tagline { get; set; }          // tagline
-        public string Email { get; set; }           // email
-        public string Phone { get; set; }           // phone
-        public string WhatsApp { get; set; }        // whatsapp
-        public string Address { get; set; }         // address
+        public int Id { get; set; }
+        public string? StoreName { get; set; }
+        public string? Tagline { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? WhatsApp { get; set; }
+        public string? Address { get; set; }
         
-        // Delivery Platforms
-        public string SwiggyUrl { get; set; }
-        public string ZomatoUrl { get; set; }
-        public string MagicPinUrl { get; set; }     // optional extra
+        public string? SwiggyUrl { get; set; }
+        public string? ZomatoUrl { get; set; }
+        public string? MagicPinUrl { get; set; }
 
-        // Business Hours (could be a stringified JSON if keeping it simple, 
-        // OR separate fields if required. Sticking with simple for now)
-        public string BusinessHoursJson { get; set; }
+        public string? BusinessHoursJson { get; set; }
 
-        // Announcement Ribbon
         public bool AnnouncementEnabled { get; set; } = false;
-        public string AnnouncementText { get; set; } = "";
-        public string AnnouncementVisibility { get; set; } = "both"; // "before", "after", "both"
+        public string? AnnouncementText { get; set; } = "";
+        public string? AnnouncementVisibility { get; set; } = "both";
 
         public DateTime UpdatedAt { get; set; } = DateTimeHelper.GetIndianTime();
         public string? UpdatedBy { get; set; }
