@@ -17,8 +17,10 @@ namespace DellyBelly.Domain.Entities
         public ImageEntity? Image { get; set; }
 
 
-        // Navigation property (optional for future Product linking)
+        // Navigation property
         public ICollection<Product>? Products { get; set; }
 
+        // Ingredients belonging to this category (e.g. "Cake" → Cocoa, Cream)
+        public ICollection<Ingredient>? Ingredients { get; set; }
     }
 }

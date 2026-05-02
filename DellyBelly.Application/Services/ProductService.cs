@@ -36,6 +36,8 @@ namespace DellyBelly.Application.Services
                 .AsNoTracking()
                 .Include(p => p.Category)
                 .Include(p => p.Images)
+                .Include(p => p.ProductIngredients!)
+                    .ThenInclude(pi => pi.Ingredient)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 

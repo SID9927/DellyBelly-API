@@ -25,7 +25,15 @@ namespace DellyBellyAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var galleries = await _galleryService.GetAllAsync();
-            return Ok(galleries);
+            // Projecting out the heavy 'Data' byte array to prevent multi-megabyte JSON bloat on load
+            var result = galleries.Select(g => new
+            {
+                id = g.Id,
+                fileName = g.FileName,
+                contentType = g.ContentType,
+                isActive = g.IsActive
+            });
+            return Ok(result);
         }
 
         [HttpGet("debug-count")]
@@ -40,7 +48,25 @@ namespace DellyBellyAPI.Controllers
         {
             var gallery = await _galleryService.GetByIdAsync(id);
             if (gallery == null) return NotFound();
-            return Ok(gallery);
+            
+            return Ok(new
+            {
+                id = gallery.Id,
+                fileName = gallery.FileName,
+                contentType = gallery.ContentType,
+                isActive = gallery.IsActive
+            });
+        }
+
+        [HttpGet("{id}/photo")]
+        [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Client)]
+        public async Task<IActionResult> GetPhoto(int id)
+        {
+            var gallery = await _galleryService.GetByIdAsync(id);
+            if (gallery == null || gallery.Data == null) return NotFound();
+            
+            // Serve the actual raw image stream out to the browser, allowing lazy loading & client caching
+            return File(gallery.Data, gallery.ContentType);
         }
 
         // Renamed to Upload for clarity as each upload IS a gallery item now

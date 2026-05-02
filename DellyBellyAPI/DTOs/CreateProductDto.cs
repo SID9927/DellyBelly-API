@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace DellyBellyAPI.DTOs
@@ -24,5 +25,11 @@ namespace DellyBellyAPI.DTOs
 
         [Required]
         public int CategoryId { get; set; }
+
+        /// <summary>
+        /// IDs of ingredients selected for this product.
+        /// Optional — products can have zero ingredients.
+        /// </summary>
+        public List<int>? IngredientIds { get; set; }
     }
 }

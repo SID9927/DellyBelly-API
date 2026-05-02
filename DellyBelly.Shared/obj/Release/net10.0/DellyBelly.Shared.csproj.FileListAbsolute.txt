@@ -1,0 +1,13 @@
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\bin\Release\net10.0\DellyBelly.Shared.deps.json
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\bin\Release\net10.0\DellyBelly.Shared.dll
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\bin\Release\net10.0\DellyBelly.Shared.pdb
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\DellyBelly.Shared.csproj.AssemblyReference.cache
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\DellyBelly.Shared.GeneratedMSBuildEditorConfig.editorconfig
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\DellyBelly.Shared.AssemblyInfoInputs.cache
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\DellyBelly.Shared.AssemblyInfo.cs
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\DellyBelly.Shared.csproj.CoreCompileInputs.cache
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\DellyBelly.Shared.sourcelink.json
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\DellyBelly.Shared.dll
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\refint\DellyBelly.Shared.dll
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\DellyBelly.Shared.pdb
+D:\Freelance Project\Delly Belly - Kuldeep\API\DellyBelly.Shared\obj\Release\net10.0\ref\DellyBelly.Shared.dll

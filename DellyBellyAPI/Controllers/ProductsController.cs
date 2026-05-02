@@ -5,6 +5,7 @@ using DellyBelly.Shared.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace DellyBellyAPI.Controllers
 {
@@ -52,7 +53,44 @@ namespace DellyBellyAPI.Controllers
         {
             var product = await _productService.GetByIdAsync(id);
             if (product == null) return NotFound();
-            return Ok(product);
+
+            // Project into a flat shape — avoids IgnoreCycles silently dropping nested
+            // navigation properties (Product ↔ ProductIngredient ↔ Ingredient cycle)
+            return Ok(new
+            {
+                product.Id,
+                product.Name,
+                product.Description,
+                product.Price,
+                product.Stock,
+                product.IsAvailable,
+                product.IsBestSeller,
+                product.IsRecommended,
+                product.CategoryId,
+                Category = product.Category == null ? null : new
+                {
+                    product.Category.Id,
+                    product.Category.Name,
+                },
+                Images = product.Images?.Select(img => new
+                {
+                    img.Id,
+                    img.FileName,
+                    img.ContentType,
+                }) ?? Enumerable.Empty<object>(),
+                // Flat ingredient projection — no back-references, no cycles
+                ProductIngredients = product.ProductIngredients?.Select(pi => new
+                {
+                    pi.IngredientId,
+                    Ingredient = pi.Ingredient == null ? null : new
+                    {
+                        pi.Ingredient.Id,
+                        pi.Ingredient.Name,
+                        pi.Ingredient.IsAllergen,
+                        pi.Ingredient.CategoryId,
+                    }
+                }) ?? Enumerable.Empty<object>(),
+            });
         }
 
         [HttpPost]
@@ -71,6 +109,21 @@ namespace DellyBellyAPI.Controllers
             };
 
             var created = await _productService.CreateAsync(product);
+
+            // Save ingredient links if any were selected
+            if (productDto.IngredientIds?.Any() == true)
+            {
+                var links = productDto.IngredientIds
+                    .Distinct()
+                    .Select(ingredientId => new ProductIngredient
+                    {
+                        ProductId = created.Id,
+                        IngredientId = ingredientId
+                    });
+                _context.ProductIngredients.AddRange(links);
+                await _context.SaveChangesAsync();
+            }
+
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
@@ -88,11 +141,27 @@ namespace DellyBellyAPI.Controllers
             existingProduct.IsBestSeller = productDto.IsBestSeller;
             existingProduct.IsRecommended = productDto.IsRecommended;
             existingProduct.CategoryId = productDto.CategoryId;
-            
-            // Clear navigation property to ensure FK update takes precedence
-            existingProduct.Category = null; 
+            existingProduct.Category = null; // Clear navigation property so FK update takes precedence
 
             var updated = await _productService.UpdateAsync(existingProduct);
+
+            // Sync ingredient links: delete old, insert new
+            var oldLinks = _context.ProductIngredients.Where(pi => pi.ProductId == id);
+            _context.ProductIngredients.RemoveRange(oldLinks);
+
+            if (productDto.IngredientIds?.Any() == true)
+            {
+                var newLinks = productDto.IngredientIds
+                    .Distinct()
+                    .Select(ingredientId => new ProductIngredient
+                    {
+                        ProductId = id,
+                        IngredientId = ingredientId
+                    });
+                _context.ProductIngredients.AddRange(newLinks);
+            }
+
+            await _context.SaveChangesAsync();
             return Ok(updated);
         }
 

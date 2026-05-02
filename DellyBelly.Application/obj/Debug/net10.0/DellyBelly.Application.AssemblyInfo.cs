@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DellyBelly.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1f984c727a59b8ae32f40d9d958f6ad77ff3d88c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec4c70b7e1162a3ee215301768b41465b4c6b139")]
 [assembly: System.Reflection.AssemblyProductAttribute("DellyBelly.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DellyBelly.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

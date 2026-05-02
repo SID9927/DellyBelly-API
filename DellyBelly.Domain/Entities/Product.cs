@@ -24,6 +24,7 @@ namespace DellyBelly.Domain.Entities
         // One-to-many relationship (a product can have multiple images)
         public ICollection<ImageEntity>? Images { get; set; }
 
-
+        // Many-to-many: a product has multiple ingredients via join table
+        public ICollection<ProductIngredient>? ProductIngredients { get; set; }
     }
 }

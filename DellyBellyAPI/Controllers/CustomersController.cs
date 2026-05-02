@@ -1,7 +1,9 @@
-﻿using DellyBelly.Application.Interfaces;
+using DellyBelly.Application.Interfaces;
 using DellyBelly.Domain.Entities;
+using DellyBelly.Shared.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DellyBelly.API.Controllers
 {
@@ -43,6 +45,11 @@ namespace DellyBelly.API.Controllers
         public async Task<IActionResult> Update(int id, Customer customer)
         {
             if (id != customer.Id) return BadRequest();
+            
+            var adminName = User.FindFirstValue("name") ?? User.Identity?.Name ?? "Admin";
+            customer.UpdatedAt = DateTimeHelper.GetIndianTime();
+            customer.UpdatedBy = adminName;
+
             var updated = await _customerService.UpdateAsync(customer);
             return Ok(updated);
         }

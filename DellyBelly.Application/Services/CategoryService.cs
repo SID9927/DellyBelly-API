@@ -33,6 +33,13 @@ namespace DellyBelly.Application.Services
 
                 // Step 2: load ONLY image Id/ContentType/FileName — Data column never touched
                 var catIds = list.Select(c => c.Id).ToList();
+                if (!catIds.Any())
+                {
+                    _cache.Set(cacheKey, list, new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(10))
+                        .SetAbsoluteExpiration(TimeSpan.FromHours(1)));
+                    return list;
+                }
                 var imageMetas = await _context.Images
                     .AsNoTracking()
                     .Where(i => i.CategoryId.HasValue && catIds.Contains(i.CategoryId.Value) && i.Source == "Category")

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "sR5XL2y4waw=",
+  "dgSpecHash": "WZ6GUbxltqA=",
   "success": true,
   "projectFilePath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Application\\DellyBelly.Application.csproj",
   "expectedPackageFiles": [
@@ -70,5 +70,18 @@
     "C:\\Users\\sid74\\.nuget\\packages\\system.security.cryptography.protecteddata\\9.0.4\\system.security.cryptography.protecteddata.9.0.4.nupkg.sha512",
     "C:\\Users\\sid74\\.nuget\\packages\\system.security.cryptography.xml\\8.0.2\\system.security.cryptography.xml.8.0.2.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'AutoMapper' 15.1.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-rvv3-g6hj-g44x",
+      "projectPath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Application\\DellyBelly.Application.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Application\\DellyBelly.Application.csproj",
+      "libraryId": "AutoMapper",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

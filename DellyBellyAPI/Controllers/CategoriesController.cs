@@ -43,7 +43,7 @@ namespace DellyBellyAPI.Controllers
             var category = new Category
             {
                 Name = categoryDto.Name,
-                Description = categoryDto.Description,
+                Description = categoryDto.Description ?? string.Empty,
                 IsActive = categoryDto.IsActive
             };
 
@@ -57,7 +57,7 @@ namespace DellyBellyAPI.Controllers
             if (existingCategory == null) return NotFound();
 
             existingCategory.Name = categoryDto.Name;
-            existingCategory.Description = categoryDto.Description;
+            existingCategory.Description = categoryDto.Description ?? string.Empty;
             existingCategory.IsActive = categoryDto.IsActive;
 
             var updatedCategory = await _categoryService.UpdateAsync(existingCategory);

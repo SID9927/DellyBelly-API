@@ -19,8 +19,19 @@ namespace DellyBelly.Application.Services
 
         public async Task<IEnumerable<Gallery>> GetAllAsync()
         {
-            return await _context.Galleries
+            // Only pull the fast header properties from the SQL database. 
+            // DO NOT pull the 'Data' blob into memory here to avoid massive server hang.
+            var headers = await _context.Galleries
+                .Select(g => new { g.Id, g.FileName, g.ContentType, g.IsActive })
                 .ToListAsync();
+
+            return headers.Select(h => new Gallery 
+            {
+                Id = h.Id,
+                FileName = h.FileName,
+                ContentType = h.ContentType,
+                IsActive = h.IsActive
+            });
         }
 
         public async Task<Gallery?> GetByIdAsync(int id)
