@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DellyBelly.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec4c70b7e1162a3ee215301768b41465b4c6b139")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bc1840f2d80a0967c17e2ae74b5ad8b3cb6ea7c0")]
 [assembly: System.Reflection.AssemblyProductAttribute("DellyBelly.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DellyBelly.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
