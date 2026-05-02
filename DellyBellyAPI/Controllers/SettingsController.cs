@@ -50,7 +50,7 @@ namespace DellyBellyAPI.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "admin,staff")]
+        [Authorize(Roles = "super_admin,admin,manager,staff")]
         public async Task<IActionResult> Update(SiteSettingsDto dto)
         {
             var settings = await _context.SiteSettings.FirstOrDefaultAsync();

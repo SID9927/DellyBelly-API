@@ -9,7 +9,7 @@ namespace DellyBelly.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize(Roles = "super_admin,admin,manager")]
+    [Authorize(Roles = "super_admin,admin,manager,staff")]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerService _customerService;
