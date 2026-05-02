@@ -95,10 +95,10 @@ builder.Services.AddRateLimiter(options =>
 // ─────────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
+app.UseCors("AllowAll");
+
 app.UseSwagger();
 app.UseSwaggerUI();
-
-app.UseCors("AllowAll");
 app.UseResponseCompression();
 app.UseMiddleware<RequestResponseLoggingMiddleware>();
 app.UseRateLimiter();
