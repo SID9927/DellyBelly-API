@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DellyBelly.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+373d5a59d2c471cb007329f0f72f491e31d2917a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c7e4beedd38a23ed10b6695ee6e031126bb9e37b")]
 [assembly: System.Reflection.AssemblyProductAttribute("DellyBelly.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DellyBelly.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
