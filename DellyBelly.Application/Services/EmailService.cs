@@ -104,20 +104,24 @@ namespace DellyBelly.Application.Services
                     .Where(l => l.SentAt >= today && l.IsSuccess)
                     .CountAsync();
 
-                return Math.Max(0, 500 - sentTodayCount);
+                return Math.Max(0, 10000 - sentTodayCount); // Max quota depends on provider now
             }
             catch
             {
-                return 500;
+                return 10000;
             }
         }
 
         private SmtpClient GetSmtpClient()
         {
+            var host = _config["EmailSettings:Host"] ?? "smtp.gmail.com";
+            var portString = _config["EmailSettings:Port"] ?? "587";
+            var port = int.TryParse(portString, out int p) ? p : 587;
+
             return new SmtpClient
             {
-                Host = "smtp.gmail.com",
-                Port = 587,
+                Host = host,
+                Port = port,
                 EnableSsl = true,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 UseDefaultCredentials = false,
