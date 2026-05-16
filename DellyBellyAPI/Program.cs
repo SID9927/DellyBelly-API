@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DellyBelly.Shared.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +95,10 @@ builder.Services.AddRateLimiter(options =>
 
 // ─────────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
+
+// ── Configure Static Helpers ──────────────────────────────────────────────────
+EmailTemplateHelper.SupportEmail = builder.Configuration["App:SupportEmail"] ?? "5065sid@gmail.com";
+EmailTemplateHelper.SupportPhone = builder.Configuration["App:SupportPhone"] ?? "+91 9927-666062";
 
 app.UseCors("AllowAll");
 

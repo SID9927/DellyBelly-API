@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "WZ6GUbxltqA=",
+  "dgSpecHash": "Ya/mNyvX5kg=",
   "success": true,
   "projectFilePath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Application\\DellyBelly.Application.csproj",
   "expectedPackageFiles": [
@@ -79,6 +79,30 @@
       "warningLevel": 1,
       "filePath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Application\\DellyBelly.Application.csproj",
       "libraryId": "AutoMapper",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 8.0.2 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx",
+      "projectPath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Application\\DellyBelly.Application.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Application\\DellyBelly.Application.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 8.0.2 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf",
+      "projectPath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Application\\DellyBelly.Application.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Application\\DellyBelly.Application.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
       "targetGraphs": [
         "net10.0"
       ]

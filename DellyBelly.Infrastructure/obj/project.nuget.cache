@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "PAwS6xZdq84=",
+  "dgSpecHash": "WL9DM1+1uuY=",
   "success": true,
   "projectFilePath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Infrastructure\\DellyBelly.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -98,5 +98,30 @@
     "C:\\Users\\sid74\\.nuget\\packages\\system.security.permissions\\9.0.0\\system.security.permissions.9.0.0.nupkg.sha512",
     "C:\\Users\\sid74\\.nuget\\packages\\system.windows.extensions\\9.0.0\\system.windows.extensions.9.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 9.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx",
+      "projectPath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Infrastructure\\DellyBelly.Infrastructure.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Infrastructure\\DellyBelly.Infrastructure.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 9.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-w3x6-4m5h-cxqf",
+      "projectPath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Infrastructure\\DellyBelly.Infrastructure.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Freelance Project\\Delly Belly - Kuldeep\\API\\DellyBelly.Infrastructure\\DellyBelly.Infrastructure.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

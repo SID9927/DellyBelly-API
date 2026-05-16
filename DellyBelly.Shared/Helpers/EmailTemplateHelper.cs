@@ -6,8 +6,8 @@ namespace DellyBelly.Shared.Helpers
 {
     public static class EmailTemplateHelper
     {
-        public const string SupportEmail = "5065sid@gmail.com";
-        public const string SupportPhone = "+91 9927-666062";
+        public static string SupportEmail { get; set; } = "5065sid@gmail.com";
+        public static string SupportPhone { get; set; } = "+91 9927-666062";
         private const string PrimaryColor = "#1C1007"; // Chocolate
         private const string SecondaryColor = "#D4AF37"; // Gold
         private const string BackgroundColor = "#FDFBF7"; // Cream
@@ -190,8 +190,7 @@ namespace DellyBelly.Shared.Helpers
                         <h1>DELLY BELLY</h1>
                         <p>{portalName}</p>
                     </div>
-                    <div class='body'>
-                        <div class='icon-wrap'>🔑</div>
+                    <div class='body'> 
                         <h2>Reset your password</h2>
                         <p>Hi <strong>{fullName}</strong>,</p>
                         <p>We received a request to reset your Delly Belly account password. Click the button below — this link is valid for <strong>{expiryMinutes} minutes</strong>.</p>
@@ -237,7 +236,7 @@ namespace DellyBelly.Shared.Helpers
                     <div class='header'><h1>DELLY BELLY</h1></div>
                     <div class='body'>
                         <div class='badge'>Staff Access</div>
-                        <h2>Welcome, {fullName}! 🎉</h2>
+                        <h2>Welcome, {fullName}!</h2>
                         <p>Your Delly Belly admin account has been created successfully.</p>
                         <p>You've been assigned the <strong>Staff</strong> role. A Super Admin can promote your access level as needed.</p>
                         <p style='margin-top:30px; font-weight: bold; color: {PrimaryColor};'>Stay Sweet!<br/><span style='color:{SecondaryColor};'>The Delly Belly Team</span></p>
@@ -274,7 +273,7 @@ namespace DellyBelly.Shared.Helpers
                 <div class='container'>
                     <div class='header'><h1>DELLY BELLY</h1></div>
                     <div class='body'>
-                        <h2>Verify Your Email 📧</h2>
+                        <h2>Verify Your Email</h2>
                         <p>Hi {fullName},</p>
                         <p>Thank you for registering! Please use the following 6-digit code to verify your email address. This code will expire in 10 minutes.</p>
                         <div class='otp-box'>{otp}</div>
@@ -311,8 +310,7 @@ namespace DellyBelly.Shared.Helpers
             <body>
                 <div class='container'>
                     <div class='header'><h1>DELLY BELLY</h1></div>
-                    <div class='body'>
-                        <span class='icon'>✅</span>
+                    <div class='body'> 
                         <h2>Password Updated!</h2>
                         <p>Hi <strong>{fullName}</strong>,</p>
                         <p>Your password for the Delly Belly account has been successfully updated. You can now use your new password to sign in.</p>
