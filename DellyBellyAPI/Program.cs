@@ -49,6 +49,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddHealthChecks();
 
 // ── Controllers & JSON ───────────────────────────────────────────────────────
 builder.Services.AddControllers()
@@ -113,5 +114,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/api/health");
 
 app.Run();
