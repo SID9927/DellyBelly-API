@@ -42,6 +42,53 @@ jobs:
       - name: Publish API Release
         run: dotnet publish DellyBellyAPI/DellyBelly.API.csproj -c Release -o ./publish
 
+      # Step 6.1: Configure QA Environment Configuration
+      - name: Configure QA Environment
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        shell: python
+        run: |
+          import os
+          import re
+
+          web_config_path = "./publish/web.config"
+          if os.path.exists(web_config_path):
+              with open(web_config_path, "r", encoding="utf-8") as f:
+                  content = f.read()
+              
+              # Find and replace ASPNETCORE_ENVIRONMENT value
+              if 'name="ASPNETCORE_ENVIRONMENT"' in content:
+                  content = re.sub(
+                      r'(<environmentVariable\s+name="ASPNETCORE_ENVIRONMENT"\s+value=")[^"]+(")',
+                      r'\g<1>Staging\g<2>',
+                      content
+                  )
+                  print("Configured web.config environment to Staging.")
+              else:
+                  print("ASPNETCORE_ENVIRONMENT variable not found in web.config to replace.")
+                  
+              with open(web_config_path, "w", encoding="utf-8") as f:
+                  f.write(content)
+          else:
+              print("web.config not found in publish directory!")
+
+          prod_settings = "./publish/appsettings.Production.json"
+          if os.path.exists(prod_settings):
+              os.remove(prod_settings)
+              print("Deleted appsettings.Production.json from QA publish bundle.")
+
+      # Step 6.2: Configure Production Environment Configuration
+      - name: Configure Production Environment
+        if: github.ref == 'refs/heads/production' && github.event_name == 'push'
+        shell: python
+        run: |
+          import os
+
+          staging_settings = "./publish/appsettings.Staging.json"
+          if os.path.exists(staging_settings):
+              os.remove(staging_settings)
+              print("Deleted appsettings.Staging.json from Production publish bundle.")
+
+
       # Step 6.5: Place App Offline (Production)
       - name: Place App Offline (Production)
         if: github.ref == 'refs/heads/production' && github.event_name == 'push'
