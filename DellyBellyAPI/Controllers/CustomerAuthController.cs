@@ -72,6 +72,15 @@ namespace DellyBellyAPI.Controllers
                     });
                 }
 
+                // Google has already verified this email — mark it verified if not already
+                if (!user.IsEmailVerified)
+                {
+                    user.IsEmailVerified = true;
+                    user.OTP = null;
+                    user.OTPExpiry = null;
+                    await _db.SaveChangesAsync();
+                }
+
                 return Ok(BuildResponse(user));
             }
             catch (InvalidJwtException)
@@ -94,18 +103,30 @@ namespace DellyBellyAPI.Controllers
                 FullName = fullName,
                 Email = dto.Email.Trim().ToLower(),
                 PhoneNumber = dto.Mobile.Trim(),
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                PasswordHash = string.IsNullOrWhiteSpace(dto.Password) ? string.Empty : BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Address = dto.Address?.Trim() ?? "",
                 Gender = dto.Gender,
                 DateOfBirth = dto.DateOfBirth,
                 CreatedAt = DateTimeHelper.GetIndianTime(),
-                IsEmailVerified = false,
-                OTP = otpCode,
-                OTPExpiry = DateTimeHelper.GetIndianTime().AddMinutes(10)
+                IsEmailVerified = string.IsNullOrWhiteSpace(dto.Password), // Auto-verify if no password (Google signup)
+                OTP = string.IsNullOrWhiteSpace(dto.Password) ? null : otpCode,
+                OTPExpiry = string.IsNullOrWhiteSpace(dto.Password) ? null : DateTimeHelper.GetIndianTime().AddMinutes(10)
             };
 
             _db.Customers.Add(user);
             await _db.SaveChangesAsync();
+
+            if (string.IsNullOrWhiteSpace(dto.Password))
+            {
+                // Google Signup
+                await _emailService.SendEmailAsync(
+                    user.Email,
+                    "Welcome to Delly Belly!",
+                    EmailTemplateHelper.GetWelcomeTemplate(user.FullName),
+                    "welcome"
+                );
+                return Ok(BuildResponse(user));
+            }
 
             await _emailService.SendEmailAsync(
                 user.Email,
@@ -258,6 +279,33 @@ namespace DellyBellyAPI.Controllers
             return Ok(BuildResponse(user, includeToken: false));
         }
 
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            var emailClaim = User.FindFirstValue(ClaimTypes.Email);
+            if (emailClaim == null) return Unauthorized();
+
+            var user = await _db.Customers.FirstOrDefaultAsync(u => u.Email == emailClaim);
+            if (user == null) return Unauthorized();
+
+            // If user has a password, verify the old one
+            if (!string.IsNullOrEmpty(user.PasswordHash))
+            {
+                if (string.IsNullOrEmpty(dto.OldPassword) || !BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash))
+                {
+                    return BadRequest(new { message = "Incorrect old password." });
+                }
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.UpdatedAt = DateTimeHelper.GetIndianTime();
+            user.UpdatedBy = user.FullName;
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "Password updated successfully." });
+        }
+
         private CustomerAuthResponseDto BuildResponse(Customer user, bool includeToken = true) => new(
             Token: includeToken ? GenerateJwt(user) : string.Empty,
             Email: user.Email ?? "",
@@ -267,7 +315,8 @@ namespace DellyBellyAPI.Controllers
             Avatar: !string.IsNullOrWhiteSpace(user.FullName) ? string.Concat(user.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(n => n.Length > 0 ? n[0].ToString() : "U")) : "U",
             Address: user.Address ?? "",
             Gender: user.Gender,
-            DateOfBirth: user.DateOfBirth
+            DateOfBirth: user.DateOfBirth,
+            HasPassword: !string.IsNullOrEmpty(user.PasswordHash)
         );
 
         private string GenerateJwt(Customer user)

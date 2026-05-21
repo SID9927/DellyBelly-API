@@ -47,7 +47,8 @@ namespace DellyBellyAPI.DTOs
         string Avatar,
         string Address,
         string? Gender,
-        DateTime? DateOfBirth
+        DateTime? DateOfBirth,
+        bool HasPassword
     );
 
     public record UpdateCustomerProfileDto(
@@ -56,4 +57,6 @@ namespace DellyBellyAPI.DTOs
         string? Gender,
         DateTime? DateOfBirth
     );
+
+    public record ChangePasswordDto(string? OldPassword, string NewPassword);
 }

@@ -1,0 +1,67 @@
+name: Delly Belly Backend CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - production
+  pull_request:
+    branches:
+      - main
+      - production
+
+jobs:
+  build-test-deploy:
+    name: Compile, Test & Deploy .NET API
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code from repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up .NET 10 SDK
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # Step 3: Restore NuGet Packages
+      - name: Restore NuGet Packages
+        run: dotnet restore DellyBellyAPI/DellyBelly.API.csproj
+
+      # Step 4: Compile/Build Application in Release Mode
+      - name: Compile API Project
+        run: dotnet build DellyBellyAPI/DellyBelly.API.csproj --configuration Release --no-restore
+
+      # Step 5: Run Unit Tests (Optional - uncomment when tests are ready)
+      # - name: Run Unit Tests
+      #   run: dotnet test DellyBelly.UnitTests/DellyBelly.UnitTests.csproj --configuration Release --no-build
+
+      # Step 6: Publish Compiled Web Deploy Files
+      - name: Publish API Release
+        run: dotnet publish DellyBellyAPI/DellyBelly.API.csproj -c Release -o ./publish
+
+      # Step 7: Deploy Production to ASPMonster (FTP/SFTP)
+      - name: Deploy Production to ASPMonster via FTP
+        if: github.ref == 'refs/heads/production' && github.event_name == 'push'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.PRODUCTION_FTP_SERVER }}
+          username: ${{ secrets.PRODUCTION_FTP_USERNAME }}
+          password: ${{ secrets.PRODUCTION_FTP_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: /wwwroot
+          dangerous-clean-slate: false
+
+      # Step 8: Deploy QA to tryasp.net (FTP/SFTP)
+      - name: Deploy QA Preview to tryasp.net via FTP
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.QA_FTP_SERVER }}
+          username: ${{ secrets.QA_FTP_USERNAME }}
+          password: ${{ secrets.QA_FTP_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: /wwwroot
+          dangerous-clean-slate: false

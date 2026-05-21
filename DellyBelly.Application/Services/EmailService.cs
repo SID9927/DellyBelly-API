@@ -114,9 +114,13 @@ namespace DellyBelly.Application.Services
 
         private SmtpClient GetSmtpClient()
         {
-            var host = _config["EmailSettings:Host"] ?? "smtp.gmail.com";
+            var host = _config["EmailSettings:Host"] ?? "smtp-relay.brevo.com";
             var portString = _config["EmailSettings:Port"] ?? "587";
             var port = int.TryParse(portString, out int p) ? p : 587;
+
+            // Brevo SMTP uses your Brevo account email as login, NOT the From address
+            var smtpUsername = _config["EmailSettings:SmtpUsername"] 
+                               ?? _config["EmailSettings:FromEmail"];
 
             return new SmtpClient
             {
@@ -126,7 +130,7 @@ namespace DellyBelly.Application.Services
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(
-                    _config["EmailSettings:FromEmail"], 
+                    smtpUsername,
                     _config["EmailSettings:AppPassword"]
                 )
             };

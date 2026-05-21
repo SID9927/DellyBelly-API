@@ -1,2 +1,36 @@
+## Ignore Visual Studio temporary files, build results, and user files
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Re]leases/
+x64/
+x86/
+build/
+bin/
+obj/
+
+# Publish directories
 publish/
+publish_monster/
+
+# VS files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+
+# SQL scripts / migrations (except Schema)
 migrate_monster_db.sql
+
+# User specified ignored files
+Old_SQL_Migrations/
+API_Specification.md
+EF_MIGRATIONS_CHEATSHEET.md
+*.sql
+appsettings.Staging.json

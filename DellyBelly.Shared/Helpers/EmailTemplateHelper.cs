@@ -324,6 +324,45 @@ namespace DellyBelly.Shared.Helpers
             </body>
             </html>";
         }
+
+        public static string GetWelcomeTemplate(string fullName)
+        {
+            return $@"
+            <!DOCTYPE html>
+            <html lang='en'>
+            <head>
+                <meta charset='UTF-8'>
+                <title>Welcome to the Delly Belly Family!</title>
+                <style>
+                    body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: {BackgroundColor}; margin: 0; padding: 0; }}
+                    .container {{ max-width: 560px; margin: 40px auto; background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(28,16,7,0.08); border: 1px solid #f0e6d2; }}
+                    .header {{ background-color: {PrimaryColor}; padding: 36px 20px; text-align: center; }}
+                    .header h1 {{ color: {SecondaryColor}; margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }}
+                    .body {{ padding: 48px 40px; text-align: center; }}
+                    .welcome-badge {{ display: inline-block; background: #f8f4ee; border: 2px solid {SecondaryColor}; color: {PrimaryColor}; font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; padding: 6px 18px; border-radius: 100px; margin-bottom: 24px; }}
+                    h2 {{ font-size: 24px; font-weight: 900; color: {PrimaryColor}; margin: 0 0 16px; }}
+                    p {{ font-size: 15px; color: #5c4a3a; line-height: 1.7; margin: 0 0 16px; }}
+                    .footer {{ background: #f8f5f0; padding: 28px 20px; text-align: center; font-size: 12px; color: #a18e80; border-top: 1px solid #eeebe3; }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'><h1>DELLY BELLY</h1></div>
+                    <div class='body'>
+                        <div class='welcome-badge'>Welcome</div>
+                        <h2>Hi {fullName},</h2>
+                        <p>We're so excited to have you join our sweet family! Your account has been created successfully.</p>
+                        <p>Now you're all set to browse our premium collection, place orders, and satisfy those cravings.</p>
+                        <p style='margin-top:30px; font-weight: bold; color: {PrimaryColor};'>Stay Sweet!<br/><span style='color:{SecondaryColor};'>The Delly Belly Team</span></p>
+                    </div>
+                    <div class='footer'>
+                        <p><strong>Delly Belly Bakery &amp; Cake Shop</strong></p>
+                        <p>Bhopa Road &amp; Jansath Road, Muzaffarnagar</p>
+                    </div>
+                </div>
+            </body>
+            </html>";
+        }
     }
 }
 

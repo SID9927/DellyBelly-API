@@ -59,14 +59,17 @@ namespace DellyBellyAPI.Controllers
         }
 
         [HttpGet("{id}/photo")]
-        [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetPhoto(int id)
         {
             var gallery = await _galleryService.GetByIdAsync(id);
             if (gallery == null || gallery.Data == null) return NotFound();
-            
-            // Serve the actual raw image stream out to the browser, allowing lazy loading & client caching
-            return File(gallery.Data, gallery.ContentType);
+
+            // Tell the browser to cache gallery images for 24 hours.
+            // immutable = skip revalidation entirely on repeat visits within max-age window.
+            Response.Headers["Cache-Control"] = "public, max-age=86400, immutable";
+            Response.Headers["ETag"] = $"\"gal-{id}\"";
+
+            return File(gallery.Data, gallery.ContentType, gallery.FileName);
         }
 
         // Renamed to Upload for clarity as each upload IS a gallery item now
