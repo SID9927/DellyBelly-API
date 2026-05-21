@@ -42,6 +42,128 @@ jobs:
       - name: Publish API Release
         run: dotnet publish DellyBellyAPI/DellyBelly.API.csproj -c Release -o ./publish
 
+      # Step 6.5: Place App Offline (Production)
+      - name: Place App Offline (Production)
+        if: github.ref == 'refs/heads/production' && github.event_name == 'push'
+        env:
+          FTP_SERVER: ${{ secrets.PRODUCTION_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.PRODUCTION_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.PRODUCTION_FTP_PASSWORD }}
+          TARGET_DIR: /wwwroot
+        shell: python
+        run: |
+          import ftplib
+          import io
+          import time
+          import os
+          import sys
+          import ssl
+
+          server = os.environ['FTP_SERVER']
+          username = os.environ['FTP_USERNAME']
+          password = os.environ['FTP_PASSWORD']
+          target_dir = os.environ['TARGET_DIR']
+
+          print(f"Connecting to {server}...")
+          try:
+              try:
+                  print("Trying FTPS (FTP over TLS)...")
+                  context = ssl._create_unverified_context()
+                  ftp = ftplib.FTP_TLS(context=context)
+                  ftp.connect(server, 21, timeout=30)
+                  ftp.login(username, password)
+                  ftp.prot_p()
+                  print("Connected using FTPS!")
+              except Exception as ftps_err:
+                  print(f"FTPS failed: {ftps_err}. Retrying with plain FTP...")
+                  ftp = ftplib.FTP()
+                  ftp.connect(server, 21, timeout=30)
+                  ftp.login(username, password)
+                  print("Connected using plain FTP!")
+
+              print(f"Changing directory to {target_dir}...")
+              try:
+                  ftp.cwd(target_dir)
+              except Exception as e:
+                  print(f"Could not change directory to {target_dir}: {e}")
+                  print("Root directories:")
+                  ftp.dir()
+                  raise e
+
+              print("Uploading app_offline.htm...")
+              content = "<h1>Delly Belly API is temporarily offline for maintenance. We will be back shortly!</h1>"
+              bio = io.BytesIO(content.encode('utf-8'))
+              ftp.storbinary('STOR app_offline.htm', bio)
+              print("app_offline.htm uploaded successfully!")
+              
+              ftp.quit()
+              print("Waiting 5 seconds for IIS to release locks...")
+              time.sleep(5)
+          except Exception as e:
+              print(f"Error placing app offline: {e}")
+              sys.exit(1)
+
+      # Step 6.6: Place App Offline (QA)
+      - name: Place App Offline (QA)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          FTP_SERVER: ${{ secrets.QA_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.QA_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.QA_FTP_PASSWORD }}
+          TARGET_DIR: /wwwroot
+        shell: python
+        run: |
+          import ftplib
+          import io
+          import time
+          import os
+          import sys
+          import ssl
+
+          server = os.environ['FTP_SERVER']
+          username = os.environ['FTP_USERNAME']
+          password = os.environ['FTP_PASSWORD']
+          target_dir = os.environ['TARGET_DIR']
+
+          print(f"Connecting to {server}...")
+          try:
+              try:
+                  print("Trying FTPS (FTP over TLS)...")
+                  context = ssl._create_unverified_context()
+                  ftp = ftplib.FTP_TLS(context=context)
+                  ftp.connect(server, 21, timeout=30)
+                  ftp.login(username, password)
+                  ftp.prot_p()
+                  print("Connected using FTPS!")
+              except Exception as ftps_err:
+                  print(f"FTPS failed: {ftps_err}. Retrying with plain FTP...")
+                  ftp = ftplib.FTP()
+                  ftp.connect(server, 21, timeout=30)
+                  ftp.login(username, password)
+                  print("Connected using plain FTP!")
+
+              print(f"Changing directory to {target_dir}...")
+              try:
+                  ftp.cwd(target_dir)
+              except Exception as e:
+                  print(f"Could not change directory to {target_dir}: {e}")
+                  print("Root directories:")
+                  ftp.dir()
+                  raise e
+
+              print("Uploading app_offline.htm...")
+              content = "<h1>Delly Belly API is temporarily offline for maintenance. We will be back shortly!</h1>"
+              bio = io.BytesIO(content.encode('utf-8'))
+              ftp.storbinary('STOR app_offline.htm', bio)
+              print("app_offline.htm uploaded successfully!")
+              
+              ftp.quit()
+              print("Waiting 5 seconds for IIS to release locks...")
+              time.sleep(5)
+          except Exception as e:
+              print(f"Error placing app offline: {e}")
+              sys.exit(1)
+
       # Step 7: Deploy Production to ASPMonster (FTP/SFTP)
       - name: Deploy Production to ASPMonster via FTP
         if: github.ref == 'refs/heads/production' && github.event_name == 'push'
@@ -65,3 +187,105 @@ jobs:
           local-dir: ./publish/
           server-dir: /wwwroot/
           dangerous-clean-slate: false
+
+      # Step 9: Remove App Offline (Production)
+      - name: Remove App Offline (Production)
+        if: always() && github.ref == 'refs/heads/production' && github.event_name == 'push'
+        env:
+          FTP_SERVER: ${{ secrets.PRODUCTION_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.PRODUCTION_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.PRODUCTION_FTP_PASSWORD }}
+          TARGET_DIR: /wwwroot
+        shell: python
+        run: |
+          import ftplib
+          import os
+          import sys
+          import ssl
+
+          server = os.environ['FTP_SERVER']
+          username = os.environ['FTP_USERNAME']
+          password = os.environ['FTP_PASSWORD']
+          target_dir = os.environ['TARGET_DIR']
+
+          print(f"Connecting to {server}...")
+          try:
+              try:
+                  print("Trying FTPS (FTP over TLS)...")
+                  context = ssl._create_unverified_context()
+                  ftp = ftplib.FTP_TLS(context=context)
+                  ftp.connect(server, 21, timeout=30)
+                  ftp.login(username, password)
+                  ftp.prot_p()
+                  print("Connected using FTPS!")
+              except Exception as ftps_err:
+                  print(f"FTPS failed: {ftps_err}. Retrying with plain FTP...")
+                  ftp = ftplib.FTP()
+                  ftp.connect(server, 21, timeout=30)
+                  ftp.login(username, password)
+                  print("Connected using plain FTP!")
+
+              print(f"Changing directory to {target_dir}...")
+              ftp.cwd(target_dir)
+
+              print("Deleting app_offline.htm...")
+              try:
+                  ftp.delete('app_offline.htm')
+                  print("app_offline.htm deleted successfully!")
+              except Exception as e:
+                  print(f"Could not delete app_offline.htm: {e}")
+
+              ftp.quit()
+          except Exception as e:
+              print(f"Error removing app offline: {e}")
+
+      # Step 10: Remove App Offline (QA)
+      - name: Remove App Offline (QA)
+        if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          FTP_SERVER: ${{ secrets.QA_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.QA_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.QA_FTP_PASSWORD }}
+          TARGET_DIR: /wwwroot
+        shell: python
+        run: |
+          import ftplib
+          import os
+          import sys
+          import ssl
+
+          server = os.environ['FTP_SERVER']
+          username = os.environ['FTP_USERNAME']
+          password = os.environ['FTP_PASSWORD']
+          target_dir = os.environ['TARGET_DIR']
+
+          print(f"Connecting to {server}...")
+          try:
+              try:
+                  print("Trying FTPS (FTP over TLS)...")
+                  context = ssl._create_unverified_context()
+                  ftp = ftplib.FTP_TLS(context=context)
+                  ftp.connect(server, 21, timeout=30)
+                  ftp.login(username, password)
+                  ftp.prot_p()
+                  print("Connected using FTPS!")
+              except Exception as ftps_err:
+                  print(f"FTPS failed: {ftps_err}. Retrying with plain FTP...")
+                  ftp = ftplib.FTP()
+                  ftp.connect(server, 21, timeout=30)
+                  ftp.login(username, password)
+                  print("Connected using plain FTP!")
+
+              print(f"Changing directory to {target_dir}...")
+              ftp.cwd(target_dir)
+
+              print("Deleting app_offline.htm...")
+              try:
+                  ftp.delete('app_offline.htm')
+                  print("app_offline.htm deleted successfully!")
+              except Exception as e:
+                  print(f"Could not delete app_offline.htm: {e}")
+
+              ftp.quit()
+          except Exception as e:
+              print(f"Error removing app offline: {e}")
