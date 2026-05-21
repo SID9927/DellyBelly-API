@@ -51,7 +51,7 @@ jobs:
           username: ${{ secrets.PRODUCTION_FTP_USERNAME }}
           password: ${{ secrets.PRODUCTION_FTP_PASSWORD }}
           local-dir: ./publish/
-          server-dir: /wwwroot
+          server-dir: /wwwroot/
           dangerous-clean-slate: false
 
       # Step 8: Deploy QA to tryasp.net (FTP/SFTP)
@@ -63,5 +63,5 @@ jobs:
           username: ${{ secrets.QA_FTP_USERNAME }}
           password: ${{ secrets.QA_FTP_PASSWORD }}
           local-dir: ./publish/
-          server-dir: /wwwroot
+          server-dir: /wwwroot/
           dangerous-clean-slate: false
