@@ -1,4 +1,4 @@
-﻿using DellyBelly.Application.Interfaces;
+using DellyBelly.Application.Interfaces;
 using DellyBelly.Domain.Entities;
 using DellyBelly.Infrastructure.Data;
 using DellyBelly.Shared.Helpers;
@@ -203,15 +203,29 @@ namespace DellyBellyAPI.Controllers
         [HttpGet("{id:int}/photo/{imageId:int}")]
         public async Task<IActionResult> GetProductPhoto(int id, int imageId)
         {
+            var metadata = await _context.Images
+                .AsNoTracking()
+                .Where(i => i.Id == imageId && i.ProductId == id)
+                .Select(i => new { i.UploadedAt, i.ContentType, i.FileName })
+                .FirstOrDefaultAsync();
+
+            if (metadata == null) return NotFound();
+
+            var etag = $"\"img-{imageId}-{metadata.UploadedAt.Ticks}\"";
+            Response.Headers["Cache-Control"] = "public, max-age=86400, immutable";
+            Response.Headers["ETag"] = etag;
+
+            var requestETag = Request.Headers["If-None-Match"].ToString();
+            if (requestETag == etag)
+            {
+                return StatusCode(304);
+            }
+
             var image = await _context.Images
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id == imageId && i.ProductId == id);
 
             if (image == null) return NotFound();
-
-            // Tell the browser to cache this image for 24 hours
-            Response.Headers["Cache-Control"] = "public, max-age=86400, immutable";
-            Response.Headers["ETag"] = $"\"img-{imageId}\"";
 
             return File(image.Data, image.ContentType, image.FileName);
         }

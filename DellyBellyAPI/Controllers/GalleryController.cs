@@ -2,6 +2,8 @@ using DellyBelly.Application.Interfaces;
 using DellyBelly.Application.DTOs;
 using DellyBelly.Domain.Entities;
 using DellyBelly.Shared.Helpers;
+using DellyBelly.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.IO;
@@ -15,10 +17,12 @@ namespace DellyBellyAPI.Controllers
     public class GalleryController : ControllerBase
     {
         private readonly IGalleryService _galleryService;
+        private readonly ApplicationDbContext _context;
 
-        public GalleryController(IGalleryService galleryService)
+        public GalleryController(IGalleryService galleryService, ApplicationDbContext context)
         {
             _galleryService = galleryService;
+            _context = context;
         }
 
         [HttpGet]
@@ -61,13 +65,26 @@ namespace DellyBellyAPI.Controllers
         [HttpGet("{id}/photo")]
         public async Task<IActionResult> GetPhoto(int id)
         {
+            var metadata = await _context.Galleries
+                .AsNoTracking()
+                .Where(g => g.Id == id)
+                .Select(g => new { g.UploadedAt, g.ContentType, g.FileName })
+                .FirstOrDefaultAsync();
+
+            if (metadata == null) return NotFound();
+
+            var etag = $"\"gal-{id}-{metadata.UploadedAt.Ticks}\"";
+            Response.Headers["Cache-Control"] = "public, max-age=86400, immutable";
+            Response.Headers["ETag"] = etag;
+
+            var requestETag = Request.Headers["If-None-Match"].ToString();
+            if (requestETag == etag)
+            {
+                return StatusCode(304);
+            }
+
             var gallery = await _galleryService.GetByIdAsync(id);
             if (gallery == null || gallery.Data == null) return NotFound();
-
-            // Tell the browser to cache gallery images for 24 hours.
-            // immutable = skip revalidation entirely on repeat visits within max-age window.
-            Response.Headers["Cache-Control"] = "public, max-age=86400, immutable";
-            Response.Headers["ETag"] = $"\"gal-{id}\"";
 
             return File(gallery.Data, gallery.ContentType, gallery.FileName);
         }
