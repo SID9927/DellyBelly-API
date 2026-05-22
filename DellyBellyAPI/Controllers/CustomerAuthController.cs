@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Caching.Memory;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -22,12 +23,14 @@ namespace DellyBellyAPI.Controllers
         private readonly ApplicationDbContext _db;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _config;
+        private readonly IMemoryCache _cache;
 
-        public CustomerAuthController(ApplicationDbContext db, IEmailService emailService, IConfiguration config)
+        public CustomerAuthController(ApplicationDbContext db, IEmailService emailService, IConfiguration config, IMemoryCache cache)
         {
             _db = db;
             _emailService = emailService;
             _config = config;
+            _cache = cache;
         }
 
         [HttpPost("login")]
@@ -286,6 +289,20 @@ namespace DellyBellyAPI.Controllers
             var emailClaim = User.FindFirstValue(ClaimTypes.Email);
             if (emailClaim == null) return Unauthorized();
 
+            var emailKey = emailClaim.ToLower();
+            var lockoutKey = $"pw_lock_{emailKey}";
+
+            // Check if user is locked out
+            if (_cache.TryGetValue(lockoutKey, out DateTime lockoutExpiry))
+            {
+                if (DateTime.UtcNow < lockoutExpiry)
+                {
+                    var timeLeft = lockoutExpiry - DateTime.UtcNow;
+                    var hours = Math.Ceiling(timeLeft.TotalHours);
+                    return BadRequest(new { message = $"Too many failed attempts. Password update is locked for {hours} hours." });
+                }
+            }
+
             var user = await _db.Customers.FirstOrDefaultAsync(u => u.Email == emailClaim);
             if (user == null) return Unauthorized();
 
@@ -294,9 +311,28 @@ namespace DellyBellyAPI.Controllers
             {
                 if (string.IsNullOrEmpty(dto.OldPassword) || !BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash))
                 {
-                    return BadRequest(new { message = "Incorrect old password." });
+                    var attemptKey = $"pw_attempts_{emailKey}";
+                    _cache.TryGetValue(attemptKey, out int attempts);
+                    attempts++;
+
+                    if (attempts >= 3)
+                    {
+                        var expiry = DateTime.UtcNow.AddHours(4);
+                        _cache.Set(lockoutKey, expiry, TimeSpan.FromHours(4));
+                        _cache.Remove(attemptKey); // Reset attempts since they are now locked out
+                        return BadRequest(new { message = "Too many failed attempts. Password update is locked for 4 hours." });
+                    }
+                    else
+                    {
+                        _cache.Set(attemptKey, attempts, TimeSpan.FromHours(4));
+                        return BadRequest(new { message = $"Incorrect old password. You have {3 - attempts} attempts remaining before being locked out for 4 hours." });
+                    }
                 }
             }
+
+            // Clear attempts on success
+            var attemptKeyToClear = $"pw_attempts_{emailKey}";
+            _cache.Remove(attemptKeyToClear);
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             user.UpdatedAt = DateTimeHelper.GetIndianTime();
