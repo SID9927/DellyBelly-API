@@ -1,4 +1,4 @@
-﻿using DellyBelly.Application.DTOs;
+using DellyBelly.Application.DTOs;
 using DellyBelly.Application.Interfaces;
 using DellyBelly.Domain.Entities;
 using DellyBelly.Infrastructure.Data;
@@ -32,13 +32,20 @@ namespace DellyBelly.Application.Services
 
         public async Task<Product?> GetByIdAsync(int id)
         {
-            return await _context.Products
+            var product = await _context.Products
                 .AsNoTracking()
                 .Include(p => p.Category)
                 .Include(p => p.Images)
                 .Include(p => p.ProductIngredients!)
                     .ThenInclude(pi => pi.Ingredient)
                 .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product != null && product.Images != null)
+            {
+                product.Images = product.Images.OrderBy(i => i.UploadedAt).ToList();
+            }
+
+            return product;
         }
 
         public async Task<Product> CreateAsync(Product product)
@@ -113,11 +120,11 @@ namespace DellyBelly.Application.Services
 
             var ids = productList.Select(p => p.Id).ToList();
 
-            // SELECT Id, ProductId, ContentType, FileName — NO Data column
+            // SELECT Id, ProductId, ContentType, FileName, UploadedAt — NO Data column
             var metas = await _context.Images
                 .AsNoTracking()
                 .Where(i => i.ProductId.HasValue && ids.Contains(i.ProductId.Value))
-                .Select(i => new { i.Id, i.ProductId, i.ContentType, i.FileName })
+                .Select(i => new { i.Id, i.ProductId, i.ContentType, i.FileName, i.UploadedAt })
                 .ToListAsync();
 
             var lookup = metas.ToLookup(i => i.ProductId);
@@ -125,12 +132,14 @@ namespace DellyBelly.Application.Services
             foreach (var p in productList)
             {
                 p.Images = lookup[p.Id]
+                    .OrderBy(i => i.UploadedAt)
                     .Select(i => new ImageEntity
                     {
                         Id          = i.Id,
                         ProductId   = i.ProductId,
                         ContentType = i.ContentType,
-                        FileName    = i.FileName
+                        FileName    = i.FileName,
+                        UploadedAt  = i.UploadedAt
                         // Data intentionally NOT set — stays null
                     }).ToList();
             }

@@ -21,13 +21,23 @@ namespace DellyBelly.Application.Services
 
         public async Task<IEnumerable<Wishlist>> GetUserWishlistAsync(int userId)
         {
-            return await _context.Wishlists
+            var wishlist = await _context.Wishlists
                 .Include(w => w.Product)
                 .ThenInclude(p => p.Images)
                 .Include(w => w.Product.Category)
                 .Where(w => w.UserId == userId)
                 .OrderByDescending(w => w.AddedAt)
                 .ToListAsync();
+
+            foreach (var item in wishlist)
+            {
+                if (item.Product?.Images != null)
+                {
+                    item.Product.Images = item.Product.Images.OrderBy(i => i.UploadedAt).ToList();
+                }
+            }
+
+            return wishlist;
         }
 
         public async Task<bool> ToggleWishlistAsync(int userId, int productId)

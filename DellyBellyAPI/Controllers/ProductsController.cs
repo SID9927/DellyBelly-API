@@ -255,14 +255,11 @@ namespace DellyBellyAPI.Controllers
         [HttpDelete("{id:int}/delete-photo/{imageId:int}")]
         public async Task<IActionResult> DeleteProductPhoto(int id, int imageId)
         {
-            var product = await _productService.GetByIdAsync(id);
-            if (product == null) return NotFound();
-
-            var image = product.Images?.FirstOrDefault(i => i.Id == imageId);
+            var image = await _context.Images.FirstOrDefaultAsync(i => i.Id == imageId && i.ProductId == id);
             if (image == null) return NotFound();
 
-            product.Images.Remove(image);
-            await _productService.UpdateAsync(product);
+            _context.Images.Remove(image);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -270,20 +267,29 @@ namespace DellyBellyAPI.Controllers
         [HttpPut("{id:int}/set-primary/{imageId:int}")]
         public async Task<IActionResult> SetPrimaryImage(int id, int imageId)
         {
-            var product = await _productService.GetByIdAsync(id);
-            if (product == null) return NotFound();
+            var images = await _context.Images
+                .Where(i => i.ProductId == id)
+                .ToListAsync();
 
-            var image = product.Images?.FirstOrDefault(i => i.Id == imageId);
-            if (image == null) return NotFound("Image not found");
+            var targetImage = images.FirstOrDefault(i => i.Id == imageId);
+            if (targetImage == null) return NotFound("Image not found");
 
-            // Reorder: Move selected image to index 0
-            var orderedImages = new List<ImageEntity>();
-            orderedImages.Add(image);
-            orderedImages.AddRange(product.Images.Where(i => i.Id != imageId));
+            var now = DateTimeHelper.GetIndianTime();
 
-            product.Images = orderedImages;
+            // Set the target image's UploadedAt to an epoch date to guarantee it comes first
+            targetImage.UploadedAt = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-            await _productService.UpdateAsync(product);
+            // Reset any other images that were previously marked as primary to the current time
+            var otherImages = images.Where(i => i.Id != imageId).OrderBy(i => i.UploadedAt).ToList();
+            for (int i = 0; i < otherImages.Count; i++)
+            {
+                if (otherImages[i].UploadedAt < new DateTime(2000, 1, 1))
+                {
+                    otherImages[i].UploadedAt = now.AddSeconds(i);
+                }
+            }
+
+            await _context.SaveChangesAsync();
             return Ok();
         }
     }
